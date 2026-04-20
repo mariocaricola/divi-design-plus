@@ -15,6 +15,20 @@ function ddp_register_admin_page(): void {
 	);
 }
 
+// ─── "Settings" link on Plugins list page ────────────────────────────────────
+
+add_filter( 'plugin_action_links_divi-design-plus/divi-design-plus.php', 'ddp_add_action_links' );
+
+function ddp_add_action_links( array $links ): array {
+	$settings_link = sprintf(
+		'<a href="%s">%s</a>',
+		esc_url( admin_url( 'options-general.php?page=divi-design-plus' ) ),
+		'Settings'
+	);
+	array_unshift( $links, $settings_link );
+	return $links;
+}
+
 // ─── Admin assets ─────────────────────────────────────────────────────────────
 
 add_action( 'admin_enqueue_scripts', 'ddp_enqueue_admin_assets' );
