@@ -445,15 +445,6 @@ function ddp_render_admin_page(): void {
 					</tbody>
 				</table>
 
-				<h2 style="margin-top:2em">Variables CSS personalizables</h2>
-				<p>Pega esto en <strong>Divi › Theme Options › Custom CSS</strong> y ajusta los valores:</p>
-				<pre class="ddp-code">:root {
-  --ddp-glass-blur:      32px;      /* defecto: 20px  */
-  --ddp-bento-radius:    16px;      /* defecto: 24px  */
-  --ddp-lift-y:          -14px;     /* defecto: -10px */
-  --ddp-reveal-duration: 0.8s;      /* defecto: 0.65s */
-}</pre>
-
 				<h2 style="margin-top:2em">Notas importantes</h2>
 				<ul class="ddp-notes">
 					<li>Los efectos de scroll (<code>ddp-fade-in</code>, <code>ddp-slide-up</code>, <code>ddp-reveal</code>) se activan <strong>una sola vez</strong> al entrar en pantalla.</li>
