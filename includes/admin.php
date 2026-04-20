@@ -112,6 +112,39 @@ function ddp_handle_delete_effect(): void {
 	exit;
 }
 
+// ─── Guardar variables CSS ────────────────────────────────────────────────────
+
+add_action( 'admin_post_ddp_save_vars', 'ddp_handle_save_vars' );
+
+function ddp_handle_save_vars(): void {
+	if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No autorizado.' );
+	check_admin_referer( 'ddp_save_vars' );
+
+	update_option( 'ddp_css_vars', [
+		'glass_blur'      => absint( $_POST['ddp_glass_blur']      ?? 20 ),
+		'bento_radius'    => absint( $_POST['ddp_bento_radius']     ?? 24 ),
+		'lift_y'          => absint( $_POST['ddp_lift_y']           ?? 10 ),
+		'reveal_duration' => round( (float) ( $_POST['ddp_reveal_duration'] ?? 0.65 ), 2 ),
+	] );
+
+	wp_safe_redirect( ddp_page_url( '&tab=customize&ddp_msg=vars_saved' ) );
+	exit;
+}
+
+// ─── Restablecer variables CSS ────────────────────────────────────────────────
+
+add_action( 'admin_post_ddp_reset_vars', 'ddp_handle_reset_vars' );
+
+function ddp_handle_reset_vars(): void {
+	if ( ! current_user_can( 'manage_options' ) ) wp_die( 'No autorizado.' );
+	check_admin_referer( 'ddp_reset_vars' );
+
+	delete_option( 'ddp_css_vars' );
+
+	wp_safe_redirect( ddp_page_url( '&tab=customize&ddp_msg=vars_reset' ) );
+	exit;
+}
+
 // ─── Render de la página ──────────────────────────────────────────────────────
 
 function ddp_render_admin_page(): void {
@@ -143,11 +176,17 @@ function ddp_render_admin_page(): void {
 			<div class="notice notice-success is-dismissible"><p>✓ Efecto guardado correctamente.</p></div>
 		<?php elseif ( $msg === 'deleted' ): ?>
 			<div class="notice notice-success is-dismissible"><p>✓ Efecto eliminado.</p></div>
+		<?php elseif ( $msg === 'vars_saved' ): ?>
+			<div class="notice notice-success is-dismissible"><p>✓ Variables guardadas. Los cambios ya están activos en el frontend.</p></div>
+		<?php elseif ( $msg === 'vars_reset' ): ?>
+			<div class="notice notice-success is-dismissible"><p>✓ Variables restablecidas a los valores por defecto.</p></div>
 		<?php endif; ?>
 
 		<nav class="nav-tab-wrapper ddp-tabs">
 			<a href="<?php echo esc_url( ddp_page_url( '&tab=effects' ) ); ?>"
 			   class="nav-tab <?php echo $tab === 'effects' ? 'nav-tab-active' : ''; ?>">🎨 Efectos</a>
+			<a href="<?php echo esc_url( ddp_page_url( '&tab=customize' ) ); ?>"
+			   class="nav-tab <?php echo $tab === 'customize' ? 'nav-tab-active' : ''; ?>">⚙️ Personalizar</a>
 			<a href="<?php echo esc_url( ddp_page_url( '&tab=help' ) ); ?>"
 			   class="nav-tab <?php echo $tab === 'help' ? 'nav-tab-active' : ''; ?>">📖 Ayuda</a>
 		</nav>
@@ -243,6 +282,113 @@ function ddp_render_admin_page(): void {
 					<button type="submit" class="button button-primary ddp-btn-save">Guardar efecto</button>
 				</form>
 			</div>
+
+		<?php elseif ( $tab === 'customize' ):
+			$saved = get_option( 'ddp_css_vars', [] );
+			$v = wp_parse_args( $saved, [
+				'glass_blur'      => 20,
+				'bento_radius'    => 24,
+				'lift_y'          => 10,
+				'reveal_duration' => 0.65,
+			] );
+			$controls = [
+				[
+					'key'   => 'glass_blur',
+					'label' => 'Blur del Glass',
+					'desc'  => 'Intensidad del desenfoque del efecto cristal líquido',
+					'min'   => 0, 'max' => 60, 'step' => 1, 'unit' => 'px',
+					'default' => 20,
+				],
+				[
+					'key'   => 'bento_radius',
+					'label' => 'Radio de esquinas Bento',
+					'desc'  => 'Cuánto se redondean las esquinas de las tarjetas bento',
+					'min'   => 0, 'max' => 48, 'step' => 1, 'unit' => 'px',
+					'default' => 24,
+				],
+				[
+					'key'   => 'lift_y',
+					'label' => 'Elevación del Hover Lift',
+					'desc'  => 'Cuántos píxeles sube el elemento al pasar el ratón',
+					'min'   => 0, 'max' => 40, 'step' => 1, 'unit' => 'px',
+					'default' => 10,
+				],
+				[
+					'key'   => 'reveal_duration',
+					'label' => 'Velocidad de animaciones de scroll',
+					'desc'  => 'Duración de los efectos fade-in, slide-up y reveal',
+					'min'   => 0.1, 'max' => 2, 'step' => 0.05, 'unit' => 's',
+					'default' => 0.65,
+				],
+			];
+		?>
+			<h2 class="ddp-section-title">Personalizar valores de los efectos</h2>
+			<p style="color:#6b7280;margin-bottom:24px;font-size:13px;">
+				Los cambios se aplican automáticamente en el frontend al guardar. Sin tocar código.
+			</p>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="ddp_save_vars">
+				<?php wp_nonce_field( 'ddp_save_vars' ); ?>
+
+				<div class="ddp-vars-grid">
+					<?php foreach ( $controls as $c ):
+						$val = $c['key'] === 'reveal_duration'
+							? (float) $v[ $c['key'] ]
+							: absint( $v[ $c['key'] ] );
+					?>
+					<div class="ddp-var-card">
+						<div class="ddp-var-header">
+							<strong><?php echo esc_html( $c['label'] ); ?></strong>
+							<span class="ddp-var-default">Defecto: <?php echo esc_html( $c['default'] . $c['unit'] ); ?></span>
+						</div>
+						<p class="ddp-var-desc"><?php echo esc_html( $c['desc'] ); ?></p>
+						<div class="ddp-var-input-row">
+							<input type="range"
+								   name="ddp_<?php echo esc_attr( $c['key'] ); ?>"
+								   min="<?php echo esc_attr( $c['min'] ); ?>"
+								   max="<?php echo esc_attr( $c['max'] ); ?>"
+								   step="<?php echo esc_attr( $c['step'] ); ?>"
+								   value="<?php echo esc_attr( $val ); ?>"
+								   class="ddp-range"
+								   data-target="ddp_num_<?php echo esc_attr( $c['key'] ); ?>">
+							<input type="number"
+								   id="ddp_num_<?php echo esc_attr( $c['key'] ); ?>"
+								   min="<?php echo esc_attr( $c['min'] ); ?>"
+								   max="<?php echo esc_attr( $c['max'] ); ?>"
+								   step="<?php echo esc_attr( $c['step'] ); ?>"
+								   value="<?php echo esc_attr( $val ); ?>"
+								   class="ddp-number"
+								   data-range="ddp_<?php echo esc_attr( $c['key'] ); ?>">
+							<span class="ddp-unit"><?php echo esc_html( $c['unit'] ); ?></span>
+						</div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+
+				<div class="ddp-vars-actions">
+					<button type="submit" class="button button-primary ddp-btn-save">Guardar cambios</button>
+					<span class="ddp-vars-sep">o</span>
+					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline"
+						  onsubmit="return confirm('¿Restablecer todos los valores al defecto?')">
+						<input type="hidden" name="action" value="ddp_reset_vars">
+						<?php wp_nonce_field( 'ddp_reset_vars' ); ?>
+						<button type="submit" class="button ddp-btn-reset">Restablecer defectos</button>
+					</form>
+				</div>
+			</form>
+
+			<script>
+			(function(){
+				document.querySelectorAll('.ddp-range').forEach(function(range){
+					var numId = range.dataset.target;
+					var num   = document.getElementById(numId);
+					if(!num) return;
+					range.addEventListener('input', function(){ num.value = this.value; });
+					num.addEventListener('input',   function(){ range.value = this.value; });
+				});
+			})();
+			</script>
 
 		<?php elseif ( $tab === 'help' ): ?>
 

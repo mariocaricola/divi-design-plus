@@ -3,7 +3,7 @@
  * Plugin Name:       DIVI Design Plus
  * Plugin URI:        https://github.com/mariocaricola/divi-design-plus
  * Description:       Premium CSS effects library for Divi 5. Apply liquid glass, bento, aurora, hover-lift and scroll-reveal effects by adding a <code>class</code> Attribute in Divi's Advanced tab.
- * Version:           1.2.0
+ * Version:           1.3.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mario Caricola
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DDP_VERSION',     '1.2.0' );
+define( 'DDP_VERSION',     '1.3.0' );
 define( 'DDP_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'DDP_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 
@@ -45,6 +45,30 @@ function ddp_enqueue_assets(): void {
 		[],
 		DDP_VERSION,
 		true
+	);
+}
+
+// ─── Frontend: CSS variables saved from admin panel ─────────────────────────
+
+add_action( 'wp_head', 'ddp_output_css_vars', 15 );
+
+function ddp_output_css_vars(): void {
+	$saved = get_option( 'ddp_css_vars', [] );
+	if ( empty( $saved ) ) return;
+
+	$v = wp_parse_args( $saved, [
+		'glass_blur'      => 20,
+		'bento_radius'    => 24,
+		'lift_y'          => 10,
+		'reveal_duration' => 0.65,
+	] );
+
+	printf(
+		'<style id="ddp-css-vars">:root{--ddp-glass-blur:%dpx;--ddp-bento-radius:%dpx;--ddp-lift-y:-%dpx;--ddp-reveal-duration:%.2fs;}</style>' . "\n",
+		absint( $v['glass_blur'] ),
+		absint( $v['bento_radius'] ),
+		absint( $v['lift_y'] ),
+		(float) $v['reveal_duration']
 	);
 }
 

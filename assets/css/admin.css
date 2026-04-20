@@ -315,6 +315,96 @@
 
 .ddp-notes code { background: #e8f0fe; color: #4a6cf7; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 
+/* ─── Personalizar tab — variable controls ──────────────────── */
+.ddp-vars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ddp-var-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 18px 18px;
+}
+
+.ddp-var-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ddp-var-header strong { font-size: 13px; color: #1d2327; }
+
+.ddp-var-default {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.ddp-var-desc {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.ddp-var-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ddp-range {
+  flex: 1;
+  accent-color: #667eea;
+  height: 4px;
+  cursor: pointer;
+}
+
+.ddp-number {
+  width: 62px !important;
+  text-align: center;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 5px 6px !important;
+  font-size: 13px !important;
+}
+
+.ddp-number:focus {
+  border-color: #4a6cf7 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(74,108,247,.12) !important;
+}
+
+.ddp-unit {
+  font-size: 12px;
+  color: #9ca3af;
+  min-width: 14px;
+}
+
+.ddp-vars-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.ddp-vars-sep { font-size: 12px; color: #9ca3af; }
+
+.ddp-btn-reset {
+  color: #6b7280 !important;
+  border-color: #d1d5db !important;
+}
+.ddp-btn-reset:hover {
+  color: #374151 !important;
+  border-color: #9ca3af !important;
+}
+
 /* ─── Responsive ────────────────────────────────────────────── */
 @media (max-width: 780px) {
   .ddp-form-row { grid-template-columns: 1fr; }
