@@ -1,0 +1,128 @@
+/* ============================================================
+   DIVI Design Plus — Premium Effects v1.0.0
+   Apply via Divi > Advanced > Attributes > class
+   ============================================================ */
+
+/* ─── CSS Custom Properties ────────────────────────────────── */
+:root {
+  --ddp-glass-blur:      20px;
+  --ddp-glass-sat:       180%;
+  --ddp-glass-bg:        rgba(255, 255, 255, 0.12);
+  --ddp-glass-border:    rgba(255, 255, 255, 0.30);
+  --ddp-glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --ddp-bento-radius:    24px;
+  --ddp-bento-border:    rgba(0, 0, 0, 0.07);
+  --ddp-bento-shadow:
+    0 1px 2px  rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 16px 40px rgba(0, 0, 0, 0.05);
+
+  --ddp-lift-y:          -10px;
+  --ddp-lift-shadow:     0 24px 48px rgba(0, 0, 0, 0.16);
+
+  --ddp-reveal-duration: 0.65s;
+  --ddp-reveal-ease:     cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── 1. Liquid Glass ───────────────────────────────────────── */
+.ddp-glass {
+  backdrop-filter:         blur(var(--ddp-glass-blur)) saturate(var(--ddp-glass-sat));
+  -webkit-backdrop-filter: blur(var(--ddp-glass-blur)) saturate(var(--ddp-glass-sat));
+  background:   var(--ddp-glass-bg);
+  border:       1px solid var(--ddp-glass-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    var(--ddp-glass-shadow);
+  transform:    translateZ(0);  /* GPU layer */
+  will-change:  backdrop-filter;
+}
+
+/* ─── 2. Bento SaaS ─────────────────────────────────────────── */
+.ddp-bento {
+  border-radius: var(--ddp-bento-radius);
+  border:        1px solid var(--ddp-bento-border);
+  box-shadow:    var(--ddp-bento-shadow);
+  background:    #ffffff;
+  overflow:      hidden;         /* respect radius on children */
+  transform:     translateZ(0);
+}
+
+/* ─── 3. Aurora Mesh Gradient ───────────────────────────────── */
+.ddp-aurora {
+  background: linear-gradient(
+    -45deg,
+    #ee7752, #e73c7e, #23a6d5, #23d5ab, #6c63ff, #f7971e
+  );
+  background-size: 400% 400%;
+  animation: ddp-aurora-shift 10s ease infinite;
+  transform: translateZ(0);
+  will-change: background-position;
+}
+
+@keyframes ddp-aurora-shift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* Respects prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .ddp-aurora {
+    animation: none;
+    background-position: 0% 50%;
+  }
+}
+
+/* ─── 4. Hover Lift ─────────────────────────────────────────── */
+.ddp-hover-lift {
+  transition:
+    transform    0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow   0.45s ease;
+  will-change: transform, box-shadow;
+}
+
+.ddp-hover-lift:hover {
+  transform:  translateY(var(--ddp-lift-y));
+  box-shadow: var(--ddp-lift-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ddp-hover-lift { transition: none; }
+  .ddp-hover-lift:hover { transform: none; }
+}
+
+/* ─── 5. Scroll Reveal System ───────────────────────────────── */
+
+/* Initial hidden states */
+.ddp-reveal,
+.ddp-slide-up,
+.ddp-fade-in {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.ddp-reveal   { transform: scale(0.94); }
+.ddp-slide-up { transform: translateY(36px); }
+.ddp-fade-in  { transform: none; }
+
+/* Triggered by Intersection Observer (.is-visible) */
+.ddp-reveal.is-visible,
+.ddp-slide-up.is-visible,
+.ddp-fade-in.is-visible {
+  opacity:    1;
+  transform:  none;
+  transition:
+    opacity   var(--ddp-reveal-duration) var(--ddp-reveal-ease),
+    transform var(--ddp-reveal-duration) var(--ddp-reveal-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ddp-reveal,
+  .ddp-slide-up,
+  .ddp-fade-in {
+    opacity:   1;
+    transform: none;
+  }
+}
