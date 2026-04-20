@@ -1,0 +1,326 @@
+/* ============================================================
+   DIVI Design Plus — Admin Styles v1.1.0
+   ============================================================ */
+
+/* ─── Header ────────────────────────────────────────────────── */
+.ddp-admin { max-width: 1200px; }
+
+.ddp-admin-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 6px;
+}
+
+.ddp-logo {
+  font-size: 32px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.ddp-admin-header h1 { margin: 0; font-size: 22px; }
+.ddp-subtitle        { margin: 2px 0 0; color: #888; font-size: 13px; }
+
+/* ─── Tabs ──────────────────────────────────────────────────── */
+.ddp-tabs { margin-bottom: 0; border-bottom: 1px solid #c3c4c7; }
+.ddp-tabs .nav-tab { font-size: 13px; }
+
+.ddp-tab-content {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-top: none;
+  padding: 28px 28px 36px;
+  border-radius: 0 0 4px 4px;
+}
+
+/* ─── Section titles ────────────────────────────────────────── */
+.ddp-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  margin: 0 0 16px;
+  color: #1d2327;
+}
+
+.ddp-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.ddp-badge-builtin { background: #e8f0fe; color: #4a6cf7; }
+.ddp-badge-custom  { background: #fce8f3; color: #c026d3; }
+
+/* ─── Effects grid ──────────────────────────────────────────── */
+.ddp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.ddp-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: box-shadow .2s ease, transform .2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.ddp-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  transform: translateY(-2px);
+}
+
+.ddp-card-custom { border-color: #f0abfc; }
+
+/* ─── Preview box ───────────────────────────────────────────── */
+.ddp-preview {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ddp-preview-inner {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,.15);
+}
+
+/* Override scroll-reveal initial opacity for preview */
+.ddp-preview .ddp-fade-in,
+.ddp-preview .ddp-slide-up,
+.ddp-preview .ddp-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ─── Card body & footer ────────────────────────────────────── */
+.ddp-card-body {
+  padding: 12px 14px 8px;
+  flex: 1;
+}
+
+.ddp-card-body strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #1d2327;
+}
+
+.ddp-class-pill {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #4a6cf7;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.ddp-card-body p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ddp-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-top: 1px solid #f1f5f9;
+  background: #fafbfc;
+}
+
+.ddp-tag {
+  font-size: 11px;
+  background: #e8f0fe;
+  color: #4a6cf7;
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-weight: 600;
+}
+
+.ddp-tag-custom { background: #fce8f3; color: #c026d3; }
+
+.ddp-btn-delete {
+  font-size: 11px !important;
+  padding: 2px 10px !important;
+  height: auto !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+  background: #fff !important;
+}
+.ddp-btn-delete:hover {
+  background: #fef2f2 !important;
+  border-color: #dc2626 !important;
+}
+
+/* ─── Add effect form ───────────────────────────────────────── */
+.ddp-add-box {
+  margin-top: 36px;
+  padding: 24px;
+  border: 2px dashed #c3c4c7;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.ddp-form { max-width: 760px; }
+
+.ddp-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ddp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.ddp-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ddp-form-group label small {
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.ddp-form-group input[type="text"],
+.ddp-form-group textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+
+.ddp-form-group input:focus,
+.ddp-form-group textarea:focus {
+  border-color: #4a6cf7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74,108,247,.12);
+}
+
+.ddp-form-group textarea {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  resize: vertical;
+}
+
+.ddp-btn-save {
+  margin-top: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 8px 24px !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  cursor: pointer;
+}
+.ddp-btn-save:hover { opacity: .9; }
+
+/* ─── Help tab ──────────────────────────────────────────────── */
+.ddp-help { max-width: 820px; }
+.ddp-help h2 { font-size: 16px; margin-top: 0; color: #1d2327; }
+
+.ddp-help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.ddp-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.ddp-step-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ddp-step strong { display: block; margin-bottom: 4px; font-size: 13px; }
+.ddp-step p      { margin: 0; font-size: 13px; color: #6b7280; line-height: 1.6; }
+.ddp-step code   { background: #e8f0fe; color: #4a6cf7; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+.ddp-table th { font-size: 12px; }
+.ddp-table td { font-size: 13px; vertical-align: middle; }
+.ddp-table code { background: #e8f0fe; color: #4a6cf7; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+.ddp-code {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.ddp-notes {
+  list-style: disc;
+  padding-left: 20px;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.8;
+}
+
+.ddp-notes code { background: #e8f0fe; color: #4a6cf7; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 780px) {
+  .ddp-form-row { grid-template-columns: 1fr; }
+  .ddp-grid     { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 500px) {
+  .ddp-grid { grid-template-columns: 1fr; }
+}
