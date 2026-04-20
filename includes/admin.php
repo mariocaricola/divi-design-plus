@@ -1,46 +1,77 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-// ─── Menu ─────────────────────────────────────────────────────────────────────
+// URL base de la página de ajustes
+function ddp_page_url( string $extra = '' ): string {
+	return admin_url( 'admin.php?page=divi-design-plus' . $extra );
+}
+
+// ─── Menú principal (sidebar) + entrada en Settings ──────────────────────────
 
 add_action( 'admin_menu', 'ddp_register_admin_page' );
 
 function ddp_register_admin_page(): void {
-	add_options_page(
+	// Menú de primer nivel con icono propio (posición 59, justo antes de Appearance)
+	add_menu_page(
 		'DIVI Design Plus',
-		'DIVI Design Plus',
+		'Design Plus',
+		'manage_options',
+		'divi-design-plus',
+		'ddp_render_admin_page',
+		'dashicons-art',
+		59
+	);
+
+	// Renombra el primer ítem del submenú (WordPress lo duplica por defecto)
+	add_submenu_page(
+		'divi-design-plus',
+		'DIVI Design Plus — Efectos',
+		'Efectos',
 		'manage_options',
 		'divi-design-plus',
 		'ddp_render_admin_page'
 	);
+
+	// También disponible en Settings > DIVI Design Plus
+	add_options_page(
+		'DIVI Design Plus',
+		'DIVI Design Plus',
+		'manage_options',
+		'divi-design-plus-settings',
+		'ddp_redirect_to_main'
+	);
 }
 
-// ─── "Settings" link on Plugins list page ────────────────────────────────────
+// Redirige la entrada de Settings al menú principal
+function ddp_redirect_to_main(): void {
+	wp_safe_redirect( ddp_page_url() );
+	exit;
+}
+
+// ─── Enlace "Settings" en la lista de plugins ─────────────────────────────────
 
 add_filter( 'plugin_action_links_divi-design-plus/divi-design-plus.php', 'ddp_add_action_links' );
 
 function ddp_add_action_links( array $links ): array {
-	$settings_link = sprintf(
-		'<a href="%s">%s</a>',
-		esc_url( admin_url( 'options-general.php?page=divi-design-plus' ) ),
-		'Settings'
-	);
-	array_unshift( $links, $settings_link );
+	array_unshift( $links, sprintf(
+		'<a href="%s">Settings</a>',
+		esc_url( ddp_page_url() )
+	) );
 	return $links;
 }
 
-// ─── Admin assets ─────────────────────────────────────────────────────────────
+// ─── Assets del panel ─────────────────────────────────────────────────────────
 
 add_action( 'admin_enqueue_scripts', 'ddp_enqueue_admin_assets' );
 
 function ddp_enqueue_admin_assets( string $hook ): void {
-	if ( $hook !== 'settings_page_divi-design-plus' ) return;
+	if ( ! in_array( $hook, [ 'toplevel_page_divi-design-plus', 'design-plus_page_divi-design-plus' ], true ) ) return;
 
-	wp_enqueue_style( 'divi-design-plus',       DDP_PLUGIN_URL . 'assets/css/main.css',  [], DDP_VERSION );
-	wp_enqueue_style( 'divi-design-plus-admin',  DDP_PLUGIN_URL . 'assets/css/admin.css', [], DDP_VERSION );
+	wp_enqueue_style( 'divi-design-plus',      DDP_PLUGIN_URL . 'assets/css/main.css',  [], DDP_VERSION );
+	wp_enqueue_style( 'divi-design-plus-admin', DDP_PLUGIN_URL . 'assets/css/admin.css', [], DDP_VERSION );
 }
 
-// ─── Save new effect ──────────────────────────────────────────────────────────
+// ─── Guardar efecto personalizado ─────────────────────────────────────────────
 
 add_action( 'admin_post_ddp_save_effect', 'ddp_handle_save_effect' );
 
@@ -50,18 +81,18 @@ function ddp_handle_save_effect(): void {
 
 	$effects   = get_option( 'ddp_custom_effects', [] );
 	$effects[] = [
-		'name'        => sanitize_text_field( $_POST['ddp_name']        ?? '' ),
-		'class'       => sanitize_html_class( $_POST['ddp_class']       ?? '' ),
+		'name'        => sanitize_text_field( $_POST['ddp_name']            ?? '' ),
+		'class'       => sanitize_html_class( $_POST['ddp_class']           ?? '' ),
 		'description' => sanitize_textarea_field( $_POST['ddp_description'] ?? '' ),
-		'css'         => wp_strip_all_tags( $_POST['ddp_css']           ?? '' ),
+		'css'         => wp_strip_all_tags( $_POST['ddp_css']               ?? '' ),
 	];
 	update_option( 'ddp_custom_effects', $effects );
 
-	wp_redirect( admin_url( 'options-general.php?page=divi-design-plus&ddp_msg=saved' ) );
+	wp_safe_redirect( ddp_page_url( '&ddp_msg=saved' ) );
 	exit;
 }
 
-// ─── Delete effect ────────────────────────────────────────────────────────────
+// ─── Eliminar efecto personalizado ────────────────────────────────────────────
 
 add_action( 'admin_post_ddp_delete_effect', 'ddp_handle_delete_effect' );
 
@@ -77,60 +108,25 @@ function ddp_handle_delete_effect(): void {
 		update_option( 'ddp_custom_effects', $effects );
 	}
 
-	wp_redirect( admin_url( 'options-general.php?page=divi-design-plus&ddp_msg=deleted' ) );
+	wp_safe_redirect( ddp_page_url( '&ddp_msg=deleted' ) );
 	exit;
 }
 
-// ─── Render page ──────────────────────────────────────────────────────────────
+// ─── Render de la página ──────────────────────────────────────────────────────
 
 function ddp_render_admin_page(): void {
 	$tab            = sanitize_key( $_GET['tab'] ?? 'effects' );
 	$custom_effects = get_option( 'ddp_custom_effects', [] );
-	$msg            = $_GET['ddp_msg'] ?? '';
+	$msg            = sanitize_key( $_GET['ddp_msg'] ?? '' );
 
 	$builtin = [
-		[
-			'name'        => 'Liquid Glass',
-			'class'       => 'ddp-glass',
-			'description' => 'Cristal líquido con backdrop-filter blur 20 px, saturación 180 % y borde de luz interna.',
-			'preview_bg'  => 'linear-gradient(135deg,#667eea,#764ba2)',
-		],
-		[
-			'name'        => 'Bento SaaS',
-			'class'       => 'ddp-bento',
-			'description' => 'Tarjeta estilo bento con sombra premium en tres capas y border-radius de 24 px.',
-			'preview_bg'  => 'linear-gradient(135deg,#f5f7fa,#c3cfe2)',
-		],
-		[
-			'name'        => 'Aurora Gradient',
-			'class'       => 'ddp-aurora',
-			'description' => 'Fondo animado tipo Stripe: gradiente mesh con movimiento fluido de colores.',
-			'preview_bg'  => 'none',
-		],
-		[
-			'name'        => 'Hover Lift',
-			'class'       => 'ddp-hover-lift',
-			'description' => 'Elevación magnética al hacer hover con cubic-bezier de rebote suave.',
-			'preview_bg'  => 'linear-gradient(135deg,#ffecd2,#fcb69f)',
-		],
-		[
-			'name'        => 'Fade In',
-			'class'       => 'ddp-fade-in',
-			'description' => 'Aparición suave al entrar en el viewport. Requiere scroll para activarse.',
-			'preview_bg'  => 'linear-gradient(135deg,#a1c4fd,#c2e9fb)',
-		],
-		[
-			'name'        => 'Slide Up',
-			'class'       => 'ddp-slide-up',
-			'description' => 'Deslizamiento hacia arriba + fade al entrar en el viewport.',
-			'preview_bg'  => 'linear-gradient(135deg,#d4fc79,#96e6a1)',
-		],
-		[
-			'name'        => 'Reveal',
-			'class'       => 'ddp-reveal',
-			'description' => 'Escala desde 94 % + fade al entrar en el viewport.',
-			'preview_bg'  => 'linear-gradient(135deg,#fbc2eb,#a6c1ee)',
-		],
+		[ 'name' => 'Liquid Glass',    'class' => 'ddp-glass',      'description' => 'Cristal líquido con backdrop-filter blur 20 px, saturación 180 % y borde de luz interna.', 'preview_bg' => 'linear-gradient(135deg,#667eea,#764ba2)' ],
+		[ 'name' => 'Bento SaaS',      'class' => 'ddp-bento',      'description' => 'Tarjeta estilo bento con sombra premium en tres capas y border-radius de 24 px.',           'preview_bg' => 'linear-gradient(135deg,#f5f7fa,#c3cfe2)' ],
+		[ 'name' => 'Aurora Gradient', 'class' => 'ddp-aurora',     'description' => 'Fondo animado tipo Stripe: gradiente mesh con movimiento fluido de colores.',               'preview_bg' => 'none' ],
+		[ 'name' => 'Hover Lift',      'class' => 'ddp-hover-lift', 'description' => 'Elevación magnética al hacer hover con cubic-bezier de rebote suave.',                     'preview_bg' => 'linear-gradient(135deg,#ffecd2,#fcb69f)' ],
+		[ 'name' => 'Fade In',         'class' => 'ddp-fade-in',    'description' => 'Aparición suave al entrar en el viewport. Requiere scroll para activarse.',                 'preview_bg' => 'linear-gradient(135deg,#a1c4fd,#c2e9fb)' ],
+		[ 'name' => 'Slide Up',        'class' => 'ddp-slide-up',   'description' => 'Deslizamiento hacia arriba + fade al entrar en el viewport.',                              'preview_bg' => 'linear-gradient(135deg,#d4fc79,#96e6a1)' ],
+		[ 'name' => 'Reveal',          'class' => 'ddp-reveal',     'description' => 'Escala desde 94 % + fade al entrar en el viewport.',                                       'preview_bg' => 'linear-gradient(135deg,#fbc2eb,#a6c1ee)' ],
 	];
 	?>
 	<div class="wrap ddp-admin">
@@ -150,21 +146,16 @@ function ddp_render_admin_page(): void {
 		<?php endif; ?>
 
 		<nav class="nav-tab-wrapper ddp-tabs">
-			<a href="<?php echo esc_url( admin_url( 'options-general.php?page=divi-design-plus&tab=effects' ) ); ?>"
-			   class="nav-tab <?php echo $tab === 'effects' ? 'nav-tab-active' : ''; ?>">
-				🎨 Efectos
-			</a>
-			<a href="<?php echo esc_url( admin_url( 'options-general.php?page=divi-design-plus&tab=help' ) ); ?>"
-			   class="nav-tab <?php echo $tab === 'help' ? 'nav-tab-active' : ''; ?>">
-				📖 Ayuda
-			</a>
+			<a href="<?php echo esc_url( ddp_page_url( '&tab=effects' ) ); ?>"
+			   class="nav-tab <?php echo $tab === 'effects' ? 'nav-tab-active' : ''; ?>">🎨 Efectos</a>
+			<a href="<?php echo esc_url( ddp_page_url( '&tab=help' ) ); ?>"
+			   class="nav-tab <?php echo $tab === 'help' ? 'nav-tab-active' : ''; ?>">📖 Ayuda</a>
 		</nav>
 
 		<div class="ddp-tab-content">
 
 		<?php if ( $tab === 'effects' ): ?>
 
-			<!-- ── Efectos incluidos ── -->
 			<h2 class="ddp-section-title">Efectos incluidos <span class="ddp-badge ddp-badge-builtin"><?php echo count( $builtin ); ?></span></h2>
 			<div class="ddp-grid">
 				<?php foreach ( $builtin as $e ): ?>
@@ -184,7 +175,6 @@ function ddp_render_admin_page(): void {
 				<?php endforeach; ?>
 			</div>
 
-			<!-- ── Efectos personalizados ── -->
 			<?php if ( ! empty( $custom_effects ) ): ?>
 			<h2 class="ddp-section-title" style="margin-top:2em">
 				Efectos personalizados <span class="ddp-badge ddp-badge-custom"><?php echo count( $custom_effects ); ?></span>
@@ -217,7 +207,6 @@ function ddp_render_admin_page(): void {
 			</div>
 			<?php endif; ?>
 
-			<!-- ── Añadir efecto ── -->
 			<div class="ddp-add-box">
 				<h2 class="ddp-section-title">➕ Añadir nuevo efecto personalizado</h2>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="ddp-form">
@@ -289,7 +278,7 @@ function ddp_render_admin_page(): void {
 						<div>
 							<strong>Combina clases</strong>
 							<p>Puedes poner varias clases separadas por espacio:<br>
-							   <code>ddp-bento ddp-hover-lift ddp-slide-up</code></p>
+							<code>ddp-bento ddp-hover-lift ddp-slide-up</code></p>
 						</div>
 					</div>
 				</div>
@@ -297,20 +286,16 @@ function ddp_render_admin_page(): void {
 				<h2 style="margin-top:2em">Tabla de clases disponibles</h2>
 				<table class="wp-list-table widefat fixed striped ddp-table">
 					<thead>
-						<tr>
-							<th>Clase</th>
-							<th>Efecto</th>
-							<th>Ideal para</th>
-						</tr>
+						<tr><th>Clase</th><th>Efecto</th><th>Ideal para</th></tr>
 					</thead>
 					<tbody>
-						<tr><td><code>ddp-glass</code></td>      <td>Liquid Glass — cristal líquido con blur y borde de luz</td>     <td>Secciones, cards, modales</td></tr>
-						<tr><td><code>ddp-bento</code></td>      <td>Bento SaaS — sombra premium, borde sutil, radio 24 px</td>     <td>Blurbs, rows, textos</td></tr>
-						<tr><td><code>ddp-aurora</code></td>     <td>Aurora Gradient — gradiente mesh animado tipo Stripe</td>       <td>Heroes, CTAs</td></tr>
-						<tr><td><code>ddp-hover-lift</code></td> <td>Elevación magnética al hover con resorte cubic-bezier</td>      <td>Botones, cards, imágenes</td></tr>
-						<tr><td><code>ddp-fade-in</code></td>    <td>Fade in al entrar en el viewport</td>                           <td>Cualquier módulo</td></tr>
-						<tr><td><code>ddp-slide-up</code></td>   <td>Slide hacia arriba + fade al entrar en el viewport</td>         <td>Títulos, blurbs, columnas</td></tr>
-						<tr><td><code>ddp-reveal</code></td>     <td>Escala + fade al entrar en el viewport</td>                     <td>Cards, imágenes, secciones</td></tr>
+						<tr><td><code>ddp-glass</code></td>      <td>Liquid Glass — cristal líquido con blur y borde de luz</td>    <td>Secciones, cards, modales</td></tr>
+						<tr><td><code>ddp-bento</code></td>      <td>Bento SaaS — sombra premium, borde sutil, radio 24 px</td>    <td>Blurbs, rows, textos</td></tr>
+						<tr><td><code>ddp-aurora</code></td>     <td>Aurora Gradient — gradiente mesh animado tipo Stripe</td>      <td>Heroes, CTAs</td></tr>
+						<tr><td><code>ddp-hover-lift</code></td> <td>Elevación magnética al hover con resorte cubic-bezier</td>     <td>Botones, cards, imágenes</td></tr>
+						<tr><td><code>ddp-fade-in</code></td>    <td>Fade in al entrar en el viewport</td>                          <td>Cualquier módulo</td></tr>
+						<tr><td><code>ddp-slide-up</code></td>   <td>Slide hacia arriba + fade al entrar en el viewport</td>        <td>Títulos, blurbs, columnas</td></tr>
+						<tr><td><code>ddp-reveal</code></td>     <td>Escala + fade al entrar en el viewport</td>                    <td>Cards, imágenes, secciones</td></tr>
 					</tbody>
 				</table>
 
