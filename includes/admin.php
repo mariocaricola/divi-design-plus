@@ -368,14 +368,14 @@ function ddp_render_admin_page(): void {
 
 				<div class="ddp-vars-actions">
 					<button type="submit" class="button button-primary ddp-btn-save">Guardar cambios</button>
-					<span class="ddp-vars-sep">o</span>
-					<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline"
-						  onsubmit="return confirm('¿Restablecer todos los valores al defecto?')">
-						<input type="hidden" name="action" value="ddp_reset_vars">
-						<?php wp_nonce_field( 'ddp_reset_vars' ); ?>
-						<button type="submit" class="button ddp-btn-reset">Restablecer defectos</button>
-					</form>
 				</div>
+			</form>
+
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:10px"
+				  onsubmit="return confirm('¿Restablecer todos los valores al defecto?')">
+				<input type="hidden" name="action" value="ddp_reset_vars">
+				<?php wp_nonce_field( 'ddp_reset_vars' ); ?>
+				<button type="submit" class="button ddp-btn-reset">Restablecer defectos</button>
 			</form>
 
 			<script>
