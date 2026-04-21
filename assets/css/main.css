@@ -29,6 +29,7 @@
   --ddp-orb-c1:            #667eea;
   --ddp-orb-c2:            #f093fb;
   --ddp-orb-c3:            #4facfe;
+  --ddp-orb-size:          50;
   --ddp-orb-blur:          80px;
   --ddp-orb-opacity:       0.55;
   --ddp-orb-duration:      8s;
@@ -186,21 +187,21 @@
 }
 
 .ddp-orb-1 {
-  width: 50%; aspect-ratio: 1 / 1;
+  width: calc(var(--ddp-orb-size, 50) * 1%); aspect-ratio: 1 / 1;
   background: var(--ddp-orb-c1, #667eea);
   top: -15%; left: -10%;
   animation: ddp-orb-1 var(--ddp-orb-duration, 8s) ease-in-out infinite alternate;
 }
 
 .ddp-orb-2 {
-  width: 45%; aspect-ratio: 1 / 1;
+  width: calc(var(--ddp-orb-size, 50) * 0.9%); aspect-ratio: 1 / 1;
   background: var(--ddp-orb-c2, #f093fb);
   bottom: -15%; right: -10%;
   animation: ddp-orb-2 calc(var(--ddp-orb-duration, 8s) * 1.3) ease-in-out infinite alternate;
 }
 
 .ddp-orb-3 {
-  width: 35%; aspect-ratio: 1 / 1;
+  width: calc(var(--ddp-orb-size, 50) * 0.7%); aspect-ratio: 1 / 1;
   background: var(--ddp-orb-c3, #4facfe);
   top: 35%; left: 35%;
   animation: ddp-orb-3 calc(var(--ddp-orb-duration, 8s) * 0.85) ease-in-out infinite alternate;

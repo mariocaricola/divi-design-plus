@@ -142,6 +142,7 @@ function ddp_handle_save_vars(): void {
 		'orb_c1'          => sanitize_hex_color( $_POST['ddp_orb_c1']    ?? '#667eea' ),
 		'orb_c2'          => sanitize_hex_color( $_POST['ddp_orb_c2']    ?? '#f093fb' ),
 		'orb_c3'          => sanitize_hex_color( $_POST['ddp_orb_c3']    ?? '#4facfe' ),
+		'orb_size'        => absint( $_POST['ddp_orb_size']     ?? 50 ),
 		'orb_blur'        => absint( $_POST['ddp_orb_blur']     ?? 80 ),
 		'orb_opacity'     => absint( $_POST['ddp_orb_opacity']  ?? 55 ),
 		'orb_duration'    => absint( $_POST['ddp_orb_duration'] ?? 8  ),
@@ -315,7 +316,7 @@ function ddp_render_admin_page(): void {
 				'custom_c1'       => '#ee7752', 'custom_c2'  => '#e73c7e', 'custom_c3'  => '#23a6d5',
 				'custom_c4'       => '#23d5ab', 'custom_c5'  => '#6c63ff', 'custom_c6'  => '#f7971e',
 				'orb_c1'          => '#667eea', 'orb_c2'     => '#f093fb', 'orb_c3'     => '#4facfe',
-				'orb_blur'        => 80,        'orb_opacity' => 55,       'orb_duration' => 8,
+				'orb_size'        => 50,        'orb_blur'   => 80,        'orb_opacity'  => 55,       'orb_duration' => 8,
 			] );
 
 			$sections = [
@@ -395,6 +396,15 @@ function ddp_render_admin_page(): void {
 				<div class="ddp-vars-section">
 					<h3 class="ddp-vars-section-title">🔮 Gradient Orbs</h3>
 					<div class="ddp-vars-grid">
+						<div class="ddp-var-card">
+							<div class="ddp-var-header"><strong>Tamaño</strong><span class="ddp-var-default">Def: 50%</span></div>
+							<p class="ddp-var-desc">Tamaño base de los orbs (los tres escalan proporcionalmente)</p>
+							<div class="ddp-var-input-row">
+								<input type="range" name="ddp_orb_size" min="15" max="100" step="1" value="<?php echo esc_attr( absint( $v['orb_size'] ) ); ?>" class="ddp-range" data-target="ddp_num_orb_size">
+								<input type="number" id="ddp_num_orb_size" min="15" max="100" step="1" value="<?php echo esc_attr( absint( $v['orb_size'] ) ); ?>" class="ddp-number" data-range="ddp_orb_size">
+								<span class="ddp-unit">%</span>
+							</div>
+						</div>
 						<div class="ddp-var-card">
 							<div class="ddp-var-header"><strong>Blur</strong><span class="ddp-var-default">Def: 80px</span></div>
 							<p class="ddp-var-desc">Suavidad del difuminado de cada orb</p>

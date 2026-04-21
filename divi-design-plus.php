@@ -3,7 +3,7 @@
  * Plugin Name:       DIVI Design Plus
  * Plugin URI:        https://github.com/mariocaricola/divi-design-plus
  * Description:       Premium CSS effects library for Divi 5. Apply liquid glass, bento, aurora, hover-lift and scroll-reveal effects by adding a <code>class</code> Attribute in Divi's Advanced tab.
- * Version:           1.5.0
+ * Version:           1.5.1
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mario Caricola
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DDP_VERSION',     '1.5.0' );
+define( 'DDP_VERSION',     '1.5.1' );
 define( 'DDP_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'DDP_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 
@@ -90,6 +90,7 @@ function ddp_output_css_vars(): void {
 		'orb_c1'          => '#667eea',
 		'orb_c2'          => '#f093fb',
 		'orb_c3'          => '#4facfe',
+		'orb_size'        => 50,
 		'orb_blur'        => 80,
 		'orb_opacity'     => 55,
 		'orb_duration'    => 8,
@@ -115,7 +116,7 @@ function ddp_output_css_vars(): void {
 		'--ddp-lift-y:-%dpx;--ddp-lift-shadow:%.2f;' .
 		'--ddp-reveal-duration:%.2fs;--ddp-slideup-dist:%dpx;--ddp-reveal-scale:%.2f;' .
 		'--ddp-aurora-duration:%ds;--ddp-aurora-c1:%s;--ddp-aurora-c2:%s;--ddp-aurora-c3:%s;--ddp-aurora-c4:%s;--ddp-aurora-c5:%s;--ddp-aurora-c6:%s;' .
-		'--ddp-orb-blur:%dpx;--ddp-orb-opacity:%.2f;--ddp-orb-duration:%ds;--ddp-orb-c1:%s;--ddp-orb-c2:%s;--ddp-orb-c3:%s;',
+		'--ddp-orb-size:%d;--ddp-orb-blur:%dpx;--ddp-orb-opacity:%.2f;--ddp-orb-duration:%ds;--ddp-orb-c1:%s;--ddp-orb-c2:%s;--ddp-orb-c3:%s;',
 		absint( $v['glass_blur'] ),
 		absint( $v['glass_opacity'] ) / 100,
 		absint( $v['glass_border'] )  / 100,
@@ -129,6 +130,7 @@ function ddp_output_css_vars(): void {
 		absint( $v['aurora_duration'] ),
 		esc_attr( $colors[0] ), esc_attr( $colors[1] ), esc_attr( $colors[2] ),
 		esc_attr( $colors[3] ), esc_attr( $colors[4] ), esc_attr( $colors[5] ),
+		absint( $v['orb_size'] ),
 		absint( $v['orb_blur'] ),
 		absint( $v['orb_opacity'] ) / 100,
 		absint( $v['orb_duration'] ),
