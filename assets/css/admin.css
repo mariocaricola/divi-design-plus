@@ -448,6 +448,60 @@
   text-align: center;
 }
 
+/* ─── Custom palette color pickers ─────────────────────────── */
+.ddp-palette-swatch-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ddp-palette-custom-icon { font-size: 16px; }
+
+.ddp-custom-colors {
+  display: none;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+.ddp-custom-colors.is-visible { display: block; }
+
+.ddp-color-pickers {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ddp-color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.ddp-color-item label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.ddp-color-input {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+  background: none;
+  transition: border-color .15s;
+}
+
+.ddp-color-input:hover  { border-color: #667eea; }
+.ddp-color-input:focus  { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.15); }
+
 .ddp-btn-reset {
   color: #6b7280 !important;
   border-color: #d1d5db !important;

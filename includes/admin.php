@@ -133,6 +133,12 @@ function ddp_handle_save_vars(): void {
 		'reveal_scale'    => absint( $_POST['ddp_reveal_scale']    ?? 94 ),
 		'aurora_duration' => absint( $_POST['ddp_aurora_duration'] ?? 10 ),
 		'aurora_palette'  => sanitize_key( $_POST['ddp_aurora_palette'] ?? 'stripe' ),
+		'custom_c1'       => sanitize_hex_color( $_POST['ddp_custom_c1'] ?? '#ee7752' ),
+		'custom_c2'       => sanitize_hex_color( $_POST['ddp_custom_c2'] ?? '#e73c7e' ),
+		'custom_c3'       => sanitize_hex_color( $_POST['ddp_custom_c3'] ?? '#23a6d5' ),
+		'custom_c4'       => sanitize_hex_color( $_POST['ddp_custom_c4'] ?? '#23d5ab' ),
+		'custom_c5'       => sanitize_hex_color( $_POST['ddp_custom_c5'] ?? '#6c63ff' ),
+		'custom_c6'       => sanitize_hex_color( $_POST['ddp_custom_c6'] ?? '#f7971e' ),
 	] );
 
 	wp_safe_redirect( ddp_page_url( '&tab=customize&ddp_msg=vars_saved' ) );
@@ -299,6 +305,8 @@ function ddp_render_admin_page(): void {
 				'lift_y'          => 10,   'lift_shadow'     => 16,
 				'reveal_duration' => 0.65, 'slideup_dist'    => 36,  'reveal_scale'    => 94,
 				'aurora_duration' => 10,   'aurora_palette'  => 'stripe',
+				'custom_c1'       => '#ee7752', 'custom_c2'  => '#e73c7e', 'custom_c3'  => '#23a6d5',
+				'custom_c4'       => '#23d5ab', 'custom_c5'  => '#6c63ff', 'custom_c6'  => '#f7971e',
 			] );
 
 			$sections = [
@@ -406,6 +414,30 @@ function ddp_render_admin_page(): void {
 							<span class="ddp-palette-name"><?php echo esc_html( $palette['label'] ); ?></span>
 						</label>
 						<?php endforeach; ?>
+						<label class="ddp-palette-option <?php echo $v['aurora_palette'] === 'custom' ? 'is-selected' : ''; ?>">
+							<input type="radio" name="ddp_aurora_palette" value="custom"
+								   <?php checked( $v['aurora_palette'], 'custom' ); ?>>
+							<span class="ddp-palette-swatch ddp-palette-swatch-custom"
+								  style="background:linear-gradient(135deg,<?php echo esc_attr( implode( ',', [ $v['custom_c1'], $v['custom_c2'], $v['custom_c3'], $v['custom_c4'], $v['custom_c5'], $v['custom_c6'] ] ) ); ?>)">
+								<span class="ddp-palette-custom-icon">✏️</span>
+							</span>
+							<span class="ddp-palette-name">Personalizada</span>
+						</label>
+					</div>
+
+					<div class="ddp-custom-colors <?php echo $v['aurora_palette'] === 'custom' ? 'is-visible' : ''; ?>" id="ddp-custom-colors">
+						<p style="font-size:12px;color:#6b7280;margin:12px 0 10px;">Elige los 6 colores del gradiente:</p>
+						<div class="ddp-color-pickers">
+							<?php foreach ( range(1,6) as $i ): ?>
+							<div class="ddp-color-item">
+								<label for="ddp_custom_c<?php echo $i; ?>">Color <?php echo $i; ?></label>
+								<input type="color" id="ddp_custom_c<?php echo $i; ?>"
+									   name="ddp_custom_c<?php echo $i; ?>"
+									   value="<?php echo esc_attr( $v[ 'custom_c' . $i ] ); ?>"
+									   class="ddp-color-input">
+							</div>
+							<?php endforeach; ?>
+						</div>
 					</div>
 				</div>
 
@@ -429,10 +461,21 @@ function ddp_render_admin_page(): void {
 					range.addEventListener('input', function(){ num.value = this.value; });
 					num.addEventListener('input',   function(){ range.value = this.value; });
 				});
+				var customColors = document.getElementById('ddp-custom-colors');
 				document.querySelectorAll('.ddp-palette-option input[type="radio"]').forEach(function(radio){
 					radio.addEventListener('change', function(){
 						document.querySelectorAll('.ddp-palette-option').forEach(function(el){ el.classList.remove('is-selected'); });
 						radio.closest('.ddp-palette-option').classList.add('is-selected');
+						if(customColors) customColors.classList.toggle('is-visible', radio.value === 'custom');
+					});
+				});
+				// Update custom swatch live when color inputs change
+				var customSwatch = document.querySelector('.ddp-palette-swatch-custom');
+				document.querySelectorAll('.ddp-color-input').forEach(function(input){
+					input.addEventListener('input', function(){
+						if(!customSwatch) return;
+						var colors = Array.from(document.querySelectorAll('.ddp-color-input')).map(function(i){ return i.value; });
+						customSwatch.style.background = 'linear-gradient(135deg,' + colors.join(',') + ')';
 					});
 				});
 			})();
