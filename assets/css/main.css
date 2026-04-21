@@ -25,6 +25,14 @@
   --ddp-slideup-dist:      36px;
   --ddp-reveal-scale:      0.94;
 
+  /* Orbs */
+  --ddp-orb-c1:            #667eea;
+  --ddp-orb-c2:            #f093fb;
+  --ddp-orb-c3:            #4facfe;
+  --ddp-orb-blur:          80px;
+  --ddp-orb-opacity:       0.55;
+  --ddp-orb-duration:      8s;
+
   /* Aurora */
   --ddp-aurora-duration:   10s;
   --ddp-aurora-c1:         #ee7752;
@@ -159,4 +167,63 @@
   .ddp-reveal,
   .ddp-slide-up,
   .ddp-fade-in { opacity: 1; transform: none; }
+}
+
+/* ─── 6. Gradient Orbs ──────────────────────────────────────── */
+.ddp-orbs {
+  position: relative !important;
+  overflow: hidden   !important;
+}
+
+.ddp-orb {
+  position:       absolute;
+  border-radius:  50%;
+  filter:         blur(var(--ddp-orb-blur, 80px));
+  opacity:        var(--ddp-orb-opacity, 0.55);
+  pointer-events: none;
+  will-change:    transform;
+  z-index:        0;
+}
+
+.ddp-orb-1 {
+  width: 50%; aspect-ratio: 1 / 1;
+  background: var(--ddp-orb-c1, #667eea);
+  top: -15%; left: -10%;
+  animation: ddp-orb-1 var(--ddp-orb-duration, 8s) ease-in-out infinite alternate;
+}
+
+.ddp-orb-2 {
+  width: 45%; aspect-ratio: 1 / 1;
+  background: var(--ddp-orb-c2, #f093fb);
+  bottom: -15%; right: -10%;
+  animation: ddp-orb-2 calc(var(--ddp-orb-duration, 8s) * 1.3) ease-in-out infinite alternate;
+}
+
+.ddp-orb-3 {
+  width: 35%; aspect-ratio: 1 / 1;
+  background: var(--ddp-orb-c3, #4facfe);
+  top: 35%; left: 35%;
+  animation: ddp-orb-3 calc(var(--ddp-orb-duration, 8s) * 0.85) ease-in-out infinite alternate;
+}
+
+.ddp-orbs > *:not(.ddp-orb) {
+  position: relative;
+  z-index:  1;
+}
+
+@keyframes ddp-orb-1 {
+  from { transform: translate(0, 0)   scale(1); }
+  to   { transform: translate(30%, 25%) scale(1.15); }
+}
+@keyframes ddp-orb-2 {
+  from { transform: translate(0, 0)    scale(1); }
+  to   { transform: translate(-28%, -25%) scale(1.1); }
+}
+@keyframes ddp-orb-3 {
+  from { transform: translate(0, 0)   scale(0.9); }
+  to   { transform: translate(-20%, 25%) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ddp-orb { animation: none; }
 }

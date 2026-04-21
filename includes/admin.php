@@ -139,6 +139,12 @@ function ddp_handle_save_vars(): void {
 		'custom_c4'       => sanitize_hex_color( $_POST['ddp_custom_c4'] ?? '#23d5ab' ),
 		'custom_c5'       => sanitize_hex_color( $_POST['ddp_custom_c5'] ?? '#6c63ff' ),
 		'custom_c6'       => sanitize_hex_color( $_POST['ddp_custom_c6'] ?? '#f7971e' ),
+		'orb_c1'          => sanitize_hex_color( $_POST['ddp_orb_c1']    ?? '#667eea' ),
+		'orb_c2'          => sanitize_hex_color( $_POST['ddp_orb_c2']    ?? '#f093fb' ),
+		'orb_c3'          => sanitize_hex_color( $_POST['ddp_orb_c3']    ?? '#4facfe' ),
+		'orb_blur'        => absint( $_POST['ddp_orb_blur']     ?? 80 ),
+		'orb_opacity'     => absint( $_POST['ddp_orb_opacity']  ?? 55 ),
+		'orb_duration'    => absint( $_POST['ddp_orb_duration'] ?? 8  ),
 	] );
 
 	wp_safe_redirect( ddp_page_url( '&tab=customize&ddp_msg=vars_saved' ) );
@@ -174,6 +180,7 @@ function ddp_render_admin_page(): void {
 		[ 'name' => 'Fade In',         'class' => 'ddp-fade-in',    'description' => 'Aparición suave al entrar en el viewport. Requiere scroll para activarse.',                 'preview_bg' => 'linear-gradient(135deg,#a1c4fd,#c2e9fb)' ],
 		[ 'name' => 'Slide Up',        'class' => 'ddp-slide-up',   'description' => 'Deslizamiento hacia arriba + fade al entrar en el viewport.',                              'preview_bg' => 'linear-gradient(135deg,#d4fc79,#96e6a1)' ],
 		[ 'name' => 'Reveal',          'class' => 'ddp-reveal',     'description' => 'Escala desde 94 % + fade al entrar en el viewport.',                                       'preview_bg' => 'linear-gradient(135deg,#fbc2eb,#a6c1ee)' ],
+		[ 'name' => 'Gradient Orbs',   'class' => 'ddp-orbs',       'description' => 'Tres orbs de color difusos que flotan lentamente. Efecto estilo Linear / Vercel.',            'preview_bg' => 'none' ],
 	];
 	?>
 	<div class="wrap ddp-admin">
@@ -307,6 +314,8 @@ function ddp_render_admin_page(): void {
 				'aurora_duration' => 10,   'aurora_palette'  => 'stripe',
 				'custom_c1'       => '#ee7752', 'custom_c2'  => '#e73c7e', 'custom_c3'  => '#23a6d5',
 				'custom_c4'       => '#23d5ab', 'custom_c5'  => '#6c63ff', 'custom_c6'  => '#f7971e',
+				'orb_c1'          => '#667eea', 'orb_c2'     => '#f093fb', 'orb_c3'     => '#4facfe',
+				'orb_blur'        => 80,        'orb_opacity' => 55,       'orb_duration' => 8,
 			] );
 
 			$sections = [
@@ -381,6 +390,52 @@ function ddp_render_admin_page(): void {
 					</div>
 				</div>
 				<?php endforeach; ?>
+
+				<!-- Orbs -->
+				<div class="ddp-vars-section">
+					<h3 class="ddp-vars-section-title">🔮 Gradient Orbs</h3>
+					<div class="ddp-vars-grid">
+						<div class="ddp-var-card">
+							<div class="ddp-var-header"><strong>Blur</strong><span class="ddp-var-default">Def: 80px</span></div>
+							<p class="ddp-var-desc">Suavidad del difuminado de cada orb</p>
+							<div class="ddp-var-input-row">
+								<input type="range" name="ddp_orb_blur" min="20" max="150" step="5" value="<?php echo esc_attr( absint( $v['orb_blur'] ) ); ?>" class="ddp-range" data-target="ddp_num_orb_blur">
+								<input type="number" id="ddp_num_orb_blur" min="20" max="150" step="5" value="<?php echo esc_attr( absint( $v['orb_blur'] ) ); ?>" class="ddp-number" data-range="ddp_orb_blur">
+								<span class="ddp-unit">px</span>
+							</div>
+						</div>
+						<div class="ddp-var-card">
+							<div class="ddp-var-header"><strong>Opacidad</strong><span class="ddp-var-default">Def: 55%</span></div>
+							<p class="ddp-var-desc">Transparencia de los orbs</p>
+							<div class="ddp-var-input-row">
+								<input type="range" name="ddp_orb_opacity" min="10" max="90" step="1" value="<?php echo esc_attr( absint( $v['orb_opacity'] ) ); ?>" class="ddp-range" data-target="ddp_num_orb_opacity">
+								<input type="number" id="ddp_num_orb_opacity" min="10" max="90" step="1" value="<?php echo esc_attr( absint( $v['orb_opacity'] ) ); ?>" class="ddp-number" data-range="ddp_orb_opacity">
+								<span class="ddp-unit">%</span>
+							</div>
+						</div>
+						<div class="ddp-var-card">
+							<div class="ddp-var-header"><strong>Velocidad</strong><span class="ddp-var-default">Def: 8s</span></div>
+							<p class="ddp-var-desc">Duración de un ciclo de movimiento</p>
+							<div class="ddp-var-input-row">
+								<input type="range" name="ddp_orb_duration" min="3" max="20" step="1" value="<?php echo esc_attr( absint( $v['orb_duration'] ) ); ?>" class="ddp-range" data-target="ddp_num_orb_duration">
+								<input type="number" id="ddp_num_orb_duration" min="3" max="20" step="1" value="<?php echo esc_attr( absint( $v['orb_duration'] ) ); ?>" class="ddp-number" data-range="ddp_orb_duration">
+								<span class="ddp-unit">s</span>
+							</div>
+						</div>
+					</div>
+					<p style="font-size:13px;font-weight:600;color:#374151;margin:4px 0 10px;">Colores de los orbs</p>
+					<div class="ddp-color-pickers">
+						<?php foreach ( [ 'orb_c1' => 'Orb 1', 'orb_c2' => 'Orb 2', 'orb_c3' => 'Orb 3' ] as $key => $label ): ?>
+						<div class="ddp-color-item">
+							<label for="ddp_<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></label>
+							<input type="color" id="ddp_<?php echo esc_attr( $key ); ?>"
+								   name="ddp_<?php echo esc_attr( $key ); ?>"
+								   value="<?php echo esc_attr( $v[ $key ] ); ?>"
+								   class="ddp-color-input">
+						</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
 
 				<!-- Aurora -->
 				<div class="ddp-vars-section">
@@ -533,6 +588,7 @@ function ddp_render_admin_page(): void {
 						<tr><td><code>ddp-fade-in</code></td>    <td>Fade in al entrar en el viewport</td>                          <td>Cualquier módulo</td></tr>
 						<tr><td><code>ddp-slide-up</code></td>   <td>Slide hacia arriba + fade al entrar en el viewport</td>        <td>Títulos, blurbs, columnas</td></tr>
 						<tr><td><code>ddp-reveal</code></td>     <td>Escala + fade al entrar en el viewport</td>                    <td>Cards, imágenes, secciones</td></tr>
+						<tr><td><code>ddp-orbs</code></td>       <td>Gradient Orbs — tres blobs de color difusos flotantes</td>      <td>Heroes, CTAs, secciones</td></tr>
 					</tbody>
 				</table>
 

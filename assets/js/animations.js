@@ -2,6 +2,17 @@
 (function () {
   'use strict';
 
+  function injectOrbLayers() {
+    document.querySelectorAll('.ddp-orbs').forEach(function(el) {
+      if (el.querySelector('.ddp-orb')) return;
+      [1, 2, 3].forEach(function(i) {
+        var orb = document.createElement('div');
+        orb.className = 'ddp-orb ddp-orb-' + i;
+        el.insertBefore(orb, el.firstChild);
+      });
+    });
+  }
+
   function injectAuroraLayers() {
     document.querySelectorAll('.ddp-aurora').forEach(function (el) {
       if (el.querySelector('.ddp-aurora-layer')) return;
@@ -13,6 +24,7 @@
 
   function init() {
     injectAuroraLayers();
+    injectOrbLayers();
 
     var targets = document.querySelectorAll('.ddp-reveal, .ddp-slide-up, .ddp-fade-in');
     if (!targets.length || !('IntersectionObserver' in window)) {
