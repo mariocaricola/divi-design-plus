@@ -3,7 +3,7 @@
  * Plugin Name:       DIVI Design Plus
  * Plugin URI:        https://github.com/mariocaricola/divi-design-plus
  * Description:       Premium CSS effects library for Divi 5. Apply liquid glass, bento, aurora, hover-lift and scroll-reveal effects by adding a <code>class</code> Attribute in Divi's Advanced tab.
- * Version:           1.3.2
+ * Version:           1.4.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mario Caricola
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DDP_VERSION',     '1.3.2' );
+define( 'DDP_VERSION',     '1.4.0' );
 define( 'DDP_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'DDP_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 
@@ -52,24 +52,61 @@ function ddp_enqueue_assets(): void {
 
 add_action( 'wp_head', 'ddp_output_css_vars', 15 );
 
+function ddp_aurora_palettes(): array {
+	return [
+		'stripe'   => [ 'label' => 'Stripe (defecto)', 'colors' => [ '#ee7752','#e73c7e','#23a6d5','#23d5ab','#6c63ff','#f7971e' ] ],
+		'sunset'   => [ 'label' => 'Sunset',           'colors' => [ '#f7971e','#ff6b6b','#feca57','#ff9ff3','#ff6348','#ffeaa7' ] ],
+		'ocean'    => [ 'label' => 'Ocean',             'colors' => [ '#0652DD','#1289A7','#006266','#00b894','#0984e3','#74b9ff' ] ],
+		'forest'   => [ 'label' => 'Forest',            'colors' => [ '#00b894','#00cec9','#6c5ce7','#a29bfe','#55efc4','#81ecec' ] ],
+		'candy'    => [ 'label' => 'Candy',             'colors' => [ '#fd79a8','#e17055','#fdcb6e','#a29bfe','#fd79a8','#fab1a0' ] ],
+		'midnight' => [ 'label' => 'Midnight',          'colors' => [ '#2d3436','#6c5ce7','#0984e3','#00b894','#a29bfe','#74b9ff' ] ],
+	];
+}
+
 function ddp_output_css_vars(): void {
 	$saved = get_option( 'ddp_css_vars', [] );
 	if ( empty( $saved ) ) return;
 
 	$v = wp_parse_args( $saved, [
 		'glass_blur'      => 20,
+		'glass_opacity'   => 12,
+		'glass_border'    => 30,
 		'bento_radius'    => 24,
+		'bento_shadow'    => 5,
 		'lift_y'          => 10,
+		'lift_shadow'     => 16,
 		'reveal_duration' => 0.65,
+		'slideup_dist'    => 36,
+		'reveal_scale'    => 94,
+		'aurora_duration' => 10,
+		'aurora_palette'  => 'stripe',
 	] );
 
-	printf(
-		'<style id="ddp-css-vars">:root{--ddp-glass-blur:%dpx;--ddp-bento-radius:%dpx;--ddp-lift-y:-%dpx;--ddp-reveal-duration:%.2fs;}</style>' . "\n",
+	$palettes = ddp_aurora_palettes();
+	$colors   = ( $palettes[ $v['aurora_palette'] ] ?? $palettes['stripe'] )['colors'];
+
+	$vars = sprintf(
+		'--ddp-glass-blur:%dpx;--ddp-glass-opacity:%.2f;--ddp-glass-border:%.2f;' .
+		'--ddp-bento-radius:%dpx;--ddp-bento-shadow:%.2f;' .
+		'--ddp-lift-y:-%dpx;--ddp-lift-shadow:%.2f;' .
+		'--ddp-reveal-duration:%.2fs;--ddp-slideup-dist:%dpx;--ddp-reveal-scale:%.2f;' .
+		'--ddp-aurora-duration:%ds;--ddp-aurora-c1:%s;--ddp-aurora-c2:%s;--ddp-aurora-c3:%s;--ddp-aurora-c4:%s;--ddp-aurora-c5:%s;--ddp-aurora-c6:%s;',
 		absint( $v['glass_blur'] ),
+		absint( $v['glass_opacity'] ) / 100,
+		absint( $v['glass_border'] )  / 100,
 		absint( $v['bento_radius'] ),
+		absint( $v['bento_shadow'] )  / 100,
 		absint( $v['lift_y'] ),
-		(float) $v['reveal_duration']
+		absint( $v['lift_shadow'] )   / 100,
+		(float) $v['reveal_duration'],
+		absint( $v['slideup_dist'] ),
+		absint( $v['reveal_scale'] )  / 100,
+		absint( $v['aurora_duration'] ),
+		esc_attr( $colors[0] ), esc_attr( $colors[1] ), esc_attr( $colors[2] ),
+		esc_attr( $colors[3] ), esc_attr( $colors[4] ), esc_attr( $colors[5] )
 	);
+
+	echo '<style id="ddp-css-vars">:root{' . $vars . '}</style>' . "\n";
 }
 
 // ─── Frontend: custom effects CSS saved from admin ───────────────────────────

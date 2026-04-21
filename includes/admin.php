@@ -122,9 +122,17 @@ function ddp_handle_save_vars(): void {
 
 	update_option( 'ddp_css_vars', [
 		'glass_blur'      => absint( $_POST['ddp_glass_blur']      ?? 20 ),
-		'bento_radius'    => absint( $_POST['ddp_bento_radius']     ?? 24 ),
-		'lift_y'          => absint( $_POST['ddp_lift_y']           ?? 10 ),
+		'glass_opacity'   => absint( $_POST['ddp_glass_opacity']   ?? 12 ),
+		'glass_border'    => absint( $_POST['ddp_glass_border']    ?? 30 ),
+		'bento_radius'    => absint( $_POST['ddp_bento_radius']    ?? 24 ),
+		'bento_shadow'    => absint( $_POST['ddp_bento_shadow']    ?? 5  ),
+		'lift_y'          => absint( $_POST['ddp_lift_y']          ?? 10 ),
+		'lift_shadow'     => absint( $_POST['ddp_lift_shadow']     ?? 16 ),
 		'reveal_duration' => round( (float) ( $_POST['ddp_reveal_duration'] ?? 0.65 ), 2 ),
+		'slideup_dist'    => absint( $_POST['ddp_slideup_dist']    ?? 36 ),
+		'reveal_scale'    => absint( $_POST['ddp_reveal_scale']    ?? 94 ),
+		'aurora_duration' => absint( $_POST['ddp_aurora_duration'] ?? 10 ),
+		'aurora_palette'  => sanitize_key( $_POST['ddp_aurora_palette'] ?? 'stripe' ),
 	] );
 
 	wp_safe_redirect( ddp_page_url( '&tab=customize&ddp_msg=vars_saved' ) );
@@ -286,84 +294,119 @@ function ddp_render_admin_page(): void {
 		<?php elseif ( $tab === 'customize' ):
 			$saved = get_option( 'ddp_css_vars', [] );
 			$v = wp_parse_args( $saved, [
-				'glass_blur'      => 20,
-				'bento_radius'    => 24,
-				'lift_y'          => 10,
-				'reveal_duration' => 0.65,
+				'glass_blur'      => 20,   'glass_opacity'   => 12,  'glass_border'    => 30,
+				'bento_radius'    => 24,   'bento_shadow'    => 5,
+				'lift_y'          => 10,   'lift_shadow'     => 16,
+				'reveal_duration' => 0.65, 'slideup_dist'    => 36,  'reveal_scale'    => 94,
+				'aurora_duration' => 10,   'aurora_palette'  => 'stripe',
 			] );
-			$controls = [
+
+			$sections = [
 				[
-					'key'   => 'glass_blur',
-					'label' => 'Blur del Glass',
-					'desc'  => 'Intensidad del desenfoque del efecto cristal líquido',
-					'min'   => 0, 'max' => 60, 'step' => 1, 'unit' => 'px',
-					'default' => 20,
+					'title' => '🫧 Glass',
+					'controls' => [
+						[ 'key' => 'glass_blur',     'label' => 'Blur',             'desc' => 'Intensidad del desenfoque',           'min' => 0,   'max' => 60,  'step' => 1,    'unit' => 'px', 'default' => 20   ],
+						[ 'key' => 'glass_opacity',  'label' => 'Opacidad fondo',   'desc' => 'Transparencia del fondo de cristal',  'min' => 0,   'max' => 80,  'step' => 1,    'unit' => '%',  'default' => 12   ],
+						[ 'key' => 'glass_border',   'label' => 'Opacidad borde',   'desc' => 'Intensidad del borde de luz interna', 'min' => 0,   'max' => 100, 'step' => 1,    'unit' => '%',  'default' => 30   ],
+					],
 				],
 				[
-					'key'   => 'bento_radius',
-					'label' => 'Radio de esquinas Bento',
-					'desc'  => 'Cuánto se redondean las esquinas de las tarjetas bento',
-					'min'   => 0, 'max' => 48, 'step' => 1, 'unit' => 'px',
-					'default' => 24,
+					'title' => '🃏 Bento',
+					'controls' => [
+						[ 'key' => 'bento_radius',   'label' => 'Radio esquinas',   'desc' => 'Redondez de las esquinas',            'min' => 0,   'max' => 48,  'step' => 1,    'unit' => 'px', 'default' => 24   ],
+						[ 'key' => 'bento_shadow',   'label' => 'Sombra',           'desc' => 'Intensidad de la sombra exterior',    'min' => 0,   'max' => 30,  'step' => 1,    'unit' => '%',  'default' => 5    ],
+					],
 				],
 				[
-					'key'   => 'lift_y',
-					'label' => 'Elevación del Hover Lift',
-					'desc'  => 'Cuántos píxeles sube el elemento al pasar el ratón',
-					'min'   => 0, 'max' => 40, 'step' => 1, 'unit' => 'px',
-					'default' => 10,
+					'title' => '✨ Hover Lift',
+					'controls' => [
+						[ 'key' => 'lift_y',         'label' => 'Elevación',        'desc' => 'Píxeles que sube al hacer hover',     'min' => 0,   'max' => 40,  'step' => 1,    'unit' => 'px', 'default' => 10   ],
+						[ 'key' => 'lift_shadow',    'label' => 'Sombra al hover',  'desc' => 'Opacidad de la sombra al elevar',     'min' => 0,   'max' => 50,  'step' => 1,    'unit' => '%',  'default' => 16   ],
+					],
 				],
 				[
-					'key'   => 'reveal_duration',
-					'label' => 'Velocidad de animaciones de scroll',
-					'desc'  => 'Duración de los efectos fade-in, slide-up y reveal',
-					'min'   => 0.1, 'max' => 2, 'step' => 0.05, 'unit' => 's',
-					'default' => 0.65,
+					'title' => '🎬 Scroll Reveal',
+					'controls' => [
+						[ 'key' => 'reveal_duration','label' => 'Velocidad',        'desc' => 'Duración de fade-in, slide-up, reveal','min' => 0.1, 'max' => 2,   'step' => 0.05, 'unit' => 's',  'default' => 0.65 ],
+						[ 'key' => 'slideup_dist',   'label' => 'Distancia slide',  'desc' => 'Píxeles que sube en slide-up',        'min' => 10,  'max' => 100, 'step' => 1,    'unit' => 'px', 'default' => 36   ],
+						[ 'key' => 'reveal_scale',   'label' => 'Escala inicial',   'desc' => 'Tamaño de partida del efecto reveal', 'min' => 70,  'max' => 99,  'step' => 1,    'unit' => '%',  'default' => 94   ],
+					],
 				],
 			];
+			$palettes = ddp_aurora_palettes();
 		?>
 			<h2 class="ddp-section-title">Personalizar valores de los efectos</h2>
-			<p style="color:#6b7280;margin-bottom:24px;font-size:13px;">
-				Los cambios se aplican automáticamente en el frontend al guardar. Sin tocar código.
-			</p>
+			<p style="color:#6b7280;margin-bottom:24px;font-size:13px;">Los cambios se aplican automáticamente en el frontend al guardar. Sin tocar código.</p>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="ddp_save_vars">
 				<?php wp_nonce_field( 'ddp_save_vars' ); ?>
 
-				<div class="ddp-vars-grid">
-					<?php foreach ( $controls as $c ):
-						$val = $c['key'] === 'reveal_duration'
-							? (float) $v[ $c['key'] ]
-							: absint( $v[ $c['key'] ] );
-					?>
-					<div class="ddp-var-card">
-						<div class="ddp-var-header">
-							<strong><?php echo esc_html( $c['label'] ); ?></strong>
-							<span class="ddp-var-default">Defecto: <?php echo esc_html( $c['default'] . $c['unit'] ); ?></span>
+				<?php foreach ( $sections as $section ): ?>
+				<div class="ddp-vars-section">
+					<h3 class="ddp-vars-section-title"><?php echo esc_html( $section['title'] ); ?></h3>
+					<div class="ddp-vars-grid">
+						<?php foreach ( $section['controls'] as $c ):
+							$val = $c['step'] < 1 ? (float) $v[ $c['key'] ] : absint( $v[ $c['key'] ] );
+						?>
+						<div class="ddp-var-card">
+							<div class="ddp-var-header">
+								<strong><?php echo esc_html( $c['label'] ); ?></strong>
+								<span class="ddp-var-default">Def: <?php echo esc_html( $c['default'] . $c['unit'] ); ?></span>
+							</div>
+							<p class="ddp-var-desc"><?php echo esc_html( $c['desc'] ); ?></p>
+							<div class="ddp-var-input-row">
+								<input type="range"
+									   name="ddp_<?php echo esc_attr( $c['key'] ); ?>"
+									   min="<?php echo esc_attr( $c['min'] ); ?>" max="<?php echo esc_attr( $c['max'] ); ?>" step="<?php echo esc_attr( $c['step'] ); ?>"
+									   value="<?php echo esc_attr( $val ); ?>"
+									   class="ddp-range" data-target="ddp_num_<?php echo esc_attr( $c['key'] ); ?>">
+								<input type="number"
+									   id="ddp_num_<?php echo esc_attr( $c['key'] ); ?>"
+									   min="<?php echo esc_attr( $c['min'] ); ?>" max="<?php echo esc_attr( $c['max'] ); ?>" step="<?php echo esc_attr( $c['step'] ); ?>"
+									   value="<?php echo esc_attr( $val ); ?>"
+									   class="ddp-number" data-range="ddp_<?php echo esc_attr( $c['key'] ); ?>">
+								<span class="ddp-unit"><?php echo esc_html( $c['unit'] ); ?></span>
+							</div>
 						</div>
-						<p class="ddp-var-desc"><?php echo esc_html( $c['desc'] ); ?></p>
-						<div class="ddp-var-input-row">
-							<input type="range"
-								   name="ddp_<?php echo esc_attr( $c['key'] ); ?>"
-								   min="<?php echo esc_attr( $c['min'] ); ?>"
-								   max="<?php echo esc_attr( $c['max'] ); ?>"
-								   step="<?php echo esc_attr( $c['step'] ); ?>"
-								   value="<?php echo esc_attr( $val ); ?>"
-								   class="ddp-range"
-								   data-target="ddp_num_<?php echo esc_attr( $c['key'] ); ?>">
-							<input type="number"
-								   id="ddp_num_<?php echo esc_attr( $c['key'] ); ?>"
-								   min="<?php echo esc_attr( $c['min'] ); ?>"
-								   max="<?php echo esc_attr( $c['max'] ); ?>"
-								   step="<?php echo esc_attr( $c['step'] ); ?>"
-								   value="<?php echo esc_attr( $val ); ?>"
-								   class="ddp-number"
-								   data-range="ddp_<?php echo esc_attr( $c['key'] ); ?>">
-							<span class="ddp-unit"><?php echo esc_html( $c['unit'] ); ?></span>
+						<?php endforeach; ?>
+					</div>
+				</div>
+				<?php endforeach; ?>
+
+				<!-- Aurora -->
+				<div class="ddp-vars-section">
+					<h3 class="ddp-vars-section-title">🌌 Aurora</h3>
+					<div class="ddp-vars-grid">
+						<div class="ddp-var-card">
+							<div class="ddp-var-header">
+								<strong>Velocidad</strong>
+								<span class="ddp-var-default">Def: 10s</span>
+							</div>
+							<p class="ddp-var-desc">Duración de un ciclo completo del gradiente</p>
+							<div class="ddp-var-input-row">
+								<input type="range" name="ddp_aurora_duration" min="3" max="30" step="1"
+									   value="<?php echo esc_attr( absint( $v['aurora_duration'] ) ); ?>"
+									   class="ddp-range" data-target="ddp_num_aurora_duration">
+								<input type="number" id="ddp_num_aurora_duration" min="3" max="30" step="1"
+									   value="<?php echo esc_attr( absint( $v['aurora_duration'] ) ); ?>"
+									   class="ddp-number" data-range="ddp_aurora_duration">
+								<span class="ddp-unit">s</span>
+							</div>
 						</div>
 					</div>
-					<?php endforeach; ?>
+
+					<p style="font-size:13px;font-weight:600;color:#374151;margin:16px 0 10px;">Paleta de colores</p>
+					<div class="ddp-palette-grid">
+						<?php foreach ( $palettes as $key => $palette ): ?>
+						<label class="ddp-palette-option <?php echo $v['aurora_palette'] === $key ? 'is-selected' : ''; ?>">
+							<input type="radio" name="ddp_aurora_palette" value="<?php echo esc_attr( $key ); ?>"
+								   <?php checked( $v['aurora_palette'], $key ); ?>>
+							<span class="ddp-palette-swatch" style="background:linear-gradient(135deg,<?php echo esc_attr( implode( ',', $palette['colors'] ) ); ?>)"></span>
+							<span class="ddp-palette-name"><?php echo esc_html( $palette['label'] ); ?></span>
+						</label>
+						<?php endforeach; ?>
+					</div>
 				</div>
 
 				<div class="ddp-vars-actions">
@@ -381,11 +424,16 @@ function ddp_render_admin_page(): void {
 			<script>
 			(function(){
 				document.querySelectorAll('.ddp-range').forEach(function(range){
-					var numId = range.dataset.target;
-					var num   = document.getElementById(numId);
+					var num = document.getElementById(range.dataset.target);
 					if(!num) return;
 					range.addEventListener('input', function(){ num.value = this.value; });
 					num.addEventListener('input',   function(){ range.value = this.value; });
+				});
+				document.querySelectorAll('.ddp-palette-option input[type="radio"]').forEach(function(radio){
+					radio.addEventListener('change', function(){
+						document.querySelectorAll('.ddp-palette-option').forEach(function(el){ el.classList.remove('is-selected'); });
+						radio.closest('.ddp-palette-option').classList.add('is-selected');
+					});
 				});
 			})();
 			</script>
