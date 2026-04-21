@@ -1,8 +1,19 @@
-/* DIVI Design Plus — Scroll Reveal via Intersection Observer */
+/* DIVI Design Plus — Animations */
 (function () {
   'use strict';
 
+  function injectAuroraLayers() {
+    document.querySelectorAll('.ddp-aurora').forEach(function (el) {
+      if (el.querySelector('.ddp-aurora-layer')) return;
+      var layer = document.createElement('div');
+      layer.className = 'ddp-aurora-layer';
+      el.insertBefore(layer, el.firstChild);
+    });
+  }
+
   function init() {
+    injectAuroraLayers();
+
     var targets = document.querySelectorAll('.ddp-reveal, .ddp-slide-up, .ddp-fade-in');
     if (!targets.length || !('IntersectionObserver' in window)) {
       // Fallback: make everything visible immediately
