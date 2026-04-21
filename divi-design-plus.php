@@ -3,7 +3,7 @@
  * Plugin Name:       DIVI Design Plus
  * Plugin URI:        https://github.com/mariocaricola/divi-design-plus
  * Description:       Premium CSS effects library for Divi 5. Apply liquid glass, bento, aurora, hover-lift and scroll-reveal effects by adding a <code>class</code> Attribute in Divi's Advanced tab.
- * Version:           1.4.4
+ * Version:           1.4.5
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Mario Caricola
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DDP_VERSION',     '1.4.4' );
+define( 'DDP_VERSION',     '1.4.5' );
 define( 'DDP_PLUGIN_DIR',  plugin_dir_path( __FILE__ ) );
 define( 'DDP_PLUGIN_URL',  plugin_dir_url( __FILE__ ) );
 
@@ -60,7 +60,7 @@ function ddp_aurora_palettes(): array {
 		'forest'   => [ 'label' => 'Forest',            'colors' => [ '#00b894','#00cec9','#6c5ce7','#a29bfe','#55efc4','#81ecec' ] ],
 		'candy'    => [ 'label' => 'Candy',             'colors' => [ '#fd79a8','#e17055','#fdcb6e','#a29bfe','#fd79a8','#fab1a0' ] ],
 		'midnight' => [ 'label' => 'Midnight',          'colors' => [ '#2d3436','#6c5ce7','#0984e3','#00b894','#a29bfe','#74b9ff' ] ],
-		'mono'     => [ 'label' => 'Mono',              'colors' => [ '#f8f9fa','#dee2e6','#adb5bd','#6c757d','#343a40','#212529' ] ],
+		'mono'     => [ 'label' => 'Mono',              'colors' => [ '#f8f9fa','#212529','#dee2e6','#495057','#adb5bd','#343a40' ] ],
 	];
 }
 
